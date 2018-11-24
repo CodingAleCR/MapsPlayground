@@ -24,7 +24,6 @@ import com.google.android.gms.maps.model.MarkerOptions
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
-    private lateinit var manager: LocationManager
     private var bestLocation: Location? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,8 +33,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
-        manager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
 
     /**
@@ -52,26 +49,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         setupMap()
     }
 
-    private val UPV = LatLng(39.481106, -0.340987)
-
-    fun setupMap() {
+    private fun setupMap() {
         mMap.clear()
 
         // Add a marker in UPV and move the camera
 
         mMap.addMarker(
-            MarkerOptions().position(UPV).title("Marker in UPV").icon(
+            MarkerOptions().position(Companion.UPV).title("Marker in UPV").icon(
                 BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)
             )
         )
-
-        mMap.isMyLocationEnabled = true
 
         if (ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
+            mMap.isMyLocationEnabled = true
             bestLocation = getMyLocation()
 
             bestLocation?.let {
@@ -101,7 +95,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 .setTitle("Solicitud de permiso")
                 .setMessage(justification)
                 .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
-                    ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
+                    ActivityCompat.requestPermissions(this, arrayOf(permission, Manifest.permission.RECEIVE_SMS), requestCode)
                 }
         } else {
             ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
@@ -135,5 +129,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     companion object {
         private const val RC_ASK_LOCATION_PERMISSION = 1
+        private val UPV = LatLng(39.481106, -0.340987)
     }
 }
